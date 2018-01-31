@@ -1,31 +1,25 @@
 import {request, createServer} from 'http'
 import {URL} from 'url'
+import handleInCommingMsg from './incomming'
+import EventEmitter from 'events'
 
-export default class HttpProxy {
+export default class HttpProxy extends EventEmitter{
     constructor(options) {
-        this.target = options.target
+        super()
+        this.options = options
         this.server = createServer((req, res) => {
-            const urlInfo = new URL(this.target)
-            const {host, hostname, port, protocol} = urlInfo
-            const proxyReq = request({host, hostname, port, protocol}, proxyRes => {
-                res.writeHead(200, proxyRes.headers)
+            this.req = req
+            this.res = res
 
-                proxyRes.setEncoding('utf8');
-                proxyRes.on('data', chunk => {
-                    res.write(chunk)
-                });
-
-                proxyRes.on('end', () => {
-                    res.end()
-                });
-            })
-
-            proxyReq.on('error', e => {
-                console.log(`proxy error: ${e.message}`)
-            })
-
-            proxyReq.end()
+            const requestOptions = this.parseRquestOptions()
+            handleInCommingMsg(req, res, requestOptions, this)
         })
+    }
+
+    parseRquestOptions() {
+        const {host, hostname, port, protocol} = new URL(this.options.target)
+        const headers = this.req.headers
+        return Object.assign({host, hostname, port, protocol}, {headers})
     }
 
     listen(port) {
