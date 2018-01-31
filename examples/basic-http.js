@@ -1,12 +1,11 @@
-var util = require('util'),
-    colors = require('colors'),
+var colors = require('colors'),
     http = require('http'),
-    httpProxy = require('../../lib');
+    httpProxy = require('../src');
 
 //
 // Basic Http Proxy Server
 //
-httpProxy.createServer({
+httpProxy.createProxy({
   target:'http://localhost:9003'
 }).listen(8003);
 
@@ -19,5 +18,5 @@ http.createServer(function (req, res) {
   res.end();
 }).listen(9003);
 
-util.puts('http proxy server'.blue + ' started '.green.bold + 'on port '.blue + '8003'.yellow);
-util.puts('http server '.blue + 'started '.green.bold + 'on port '.blue + '9003 '.yellow);
+console.log('http proxy server'.blue + ' started '.green.bold + 'on port '.blue + '8003'.yellow);
+console.log('http server '.blue + 'started '.green.bold + 'on port '.blue + '9003 '.yellow);

@@ -1,3 +1,5 @@
 import HttpProxy from './http-proxy'
 
-export default new HttpProxy(options)
+export function createProxy (options) {
+    return new HttpProxy(options)
+}
