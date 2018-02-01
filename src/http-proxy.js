@@ -7,19 +7,26 @@ export default class HttpProxy extends EventEmitter{
     constructor(options) {
         super()
         this.options = options
-        this.server = createServer((req, res) => {
-            this.req = req
-            this.res = res
+        if (options) {
+            this.server = createServer((req, res) => {
+                this.req = req
+                this.res = res
+            })
 
-            const requestOptions = this.parseRquestOptions()
-            handleInCommingMsg(req, res, requestOptions, this)
-        })
+            this.proxy(req, res, options, this)
+        }
     }
 
-    parseRquestOptions() {
-        const {host, hostname, port, protocol} = new URL(this.options.target)
-        const headers = this.req.headers
+    parseRquestOptions(req, res, options) {
+        const {host, hostname, port, protocol} = new URL(options.target)
+        const headers = req.headers
         return Object.assign({host, hostname, port, protocol}, {headers})
+    }
+
+    //供中间件使用的代理函数
+    proxy(req, res, options) {
+        const requestOptions = this.parseRquestOptions(req, res, options)
+        handleInCommingMsg(req, res, requestOptions, this)
     }
 
     listen(port) {

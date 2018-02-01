@@ -1,17 +1,15 @@
-import {request} from 'http'
+import http from 'http'
+import https from 'https'
 
 export default function(req, res, requestOptions, server) {
+    const request = requestOptions.protocol === 'https:' ? https.request : http.request
     const proxyReq = request(requestOptions, proxyRes => {
-        res.writeHead(200, proxyRes.headers)
-
-        proxyRes.setEncoding('utf8');
-        proxyRes.on('data', chunk => {
-            res.write(chunk)
-        });
-
         proxyRes.on('end', () => {
+            server.emit('proxyRes', {res: proxyRes})
             res.end()
         });
+
+        proxyRes.pipe(res)
     })
 
     proxyReq.on('error', errorHandler)
