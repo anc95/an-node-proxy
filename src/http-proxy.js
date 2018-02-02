@@ -1,4 +1,4 @@
-import {request, createServer} from 'http'
+import {createServer} from 'http'
 import {URL} from 'url'
 import handleInCommingMsg from './incomming'
 import EventEmitter from 'events'
@@ -17,16 +17,27 @@ export default class HttpProxy extends EventEmitter{
         }
     }
 
-    parseRquestOptions(req, res, options) {
-        const {host, hostname, port, protocol} = new URL(options.target)
-        const headers = req.headers
-        return Object.assign({host, hostname, port, protocol}, {headers})
+    adaptTarget(options) {
+        let target = {
+            host: '',
+            hostname: '',
+            port: '80',
+            path: '/',
+            protocol: 'http:'
+        }
+        let urlInfo = typeof options.target === 'string' ? new URL(options.target) : options.target
+
+        for (const key of Object.keys(target)) {
+            target[key] = urlInfo[key]
+        }
+        
+        options.target = target
     }
 
     //供中间件使用的代理函数
     proxy(req, res, options) {
-        const requestOptions = this.parseRquestOptions(req, res, options)
-        handleInCommingMsg(req, res, requestOptions, this)
+        this.adaptTarget(options)
+        handleInCommingMsg(req, res, options, this)
     }
 
     listen(port) {
