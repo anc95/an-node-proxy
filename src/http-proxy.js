@@ -18,6 +18,10 @@ export default class HttpProxy extends EventEmitter{
     }
 
     adaptTarget(options) {
+        if (!options.target) {
+            return
+        }
+
         let target = {
             host: '',
             hostname: '',
@@ -34,9 +38,36 @@ export default class HttpProxy extends EventEmitter{
         options.target = target
     }
 
+    adaptMock(options) {
+        if (!options.mock) {
+            return;
+        }
+
+        const mock = options.mock
+        const base = mock.base || optionsprocess.cwd()
+        const rules = mock.rules
+        
+        rules.forEach(rule => {
+            rule.from = this.ensureUrlPrefix(rule.from)
+            rule.to = this.ensureUrlPrefix(rule.to)
+        })
+
+        rules.sort((a, b) => a.from.split('/').length - b.from.split('/'))
+
+        options.rules = {base, rules}
+    }
+
+    ensureUrlPrefix(url) {
+        if (url.indexOf('/') !== 0 && url.indexOf('.') !== 0) {
+            url = `/${url}`
+        }
+        return url
+    }
+
     //供中间件使用的代理函数
     proxy(req, res, options) {
         this.adaptTarget(options)
+        this.adaptMock(options)
         handleInCommingMsg(req, res, options, this)
     }
 
