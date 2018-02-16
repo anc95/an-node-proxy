@@ -5,10 +5,9 @@ var colors = require('colors'),
 //
 // Basic Http Proxy Server
 //
-httpProxy.createProxy({
+var proxy = httpProxy.createProxy({
   target:'http://localhost:9003'
 }).listen(8003);
-
 //
 // Target Http Server
 //
