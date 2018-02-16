@@ -4,10 +4,10 @@ import handleInCommingMsg from './incomming'
 import EventEmitter from 'events'
 
 export default class HttpProxy extends EventEmitter{
-    constructor(options) {
+    constructor(options, server) {
         super()
         this.options = options
-        if (options) {
+        if (server) {
             this.server = createServer((req, res) => {
                 this.req = req
                 this.res = res
@@ -44,7 +44,7 @@ export default class HttpProxy extends EventEmitter{
         }
 
         const mock = options.mock
-        const base = mock.base || optionsprocess.cwd()
+        const base = mock.base || process.cwd()
         const rules = mock.rules
         
         rules.forEach(rule => {
