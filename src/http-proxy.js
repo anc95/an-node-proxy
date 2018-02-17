@@ -66,8 +66,6 @@ export default class HttpProxy extends EventEmitter{
 
     //供中间件使用的代理函数
     proxy(req, res, options) {
-        this.adaptTarget(options)
-        this.adaptMock(options)
         handleInCommingMsg(req, res, options, this)
     }
 
