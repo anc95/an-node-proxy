@@ -1,6 +1,6 @@
 import HttpProxy from './http-proxy'
 /**
- * options = {
+ * option = {
  *     target: string, target url,
  *     headers: [{key: value}, {key, value}],  //headers will be assigned to requestHeaders
  *     mock: {
@@ -12,11 +12,11 @@ import HttpProxy from './http-proxy'
  *     }
  * } 
  */
-export function createServer (options) {
-    return new HttpProxy(options, true)
+export function createProxyServer (option) {
+    return new HttpProxy(option, true)
 }
 
-export function createProxy(options) {
-    return new HttpProxy(options, false)
+export function createProxy(option) {
+    return new HttpProxy(option, false)
 }
 

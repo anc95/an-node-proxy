@@ -1,21 +1,14 @@
-var colors = require('colors'),
-    http = require('http'),
-    httpProxy = require('../src');
+import {createServer} from 'http'
+import {createProxyServer} from '../src'
 
-//
-// Basic Http Proxy Server
-//
-var proxy = httpProxy.createProxy({
-  target:'http://localhost:9003'
-}).listen(8003);
-//
-// Target Http Server
-//
-http.createServer(function (req, res) {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.write('request successfully proxied to: ' + req.url + '\n' + JSON.stringify(req.headers, true, 2));
-  res.end();
-}).listen(9003);
+// proxy server
+createProxyServer({
+  target: 'http://localhost:8001'
+}).listen(8000)
 
-console.log('http proxy server'.blue + ' started '.green.bold + 'on port '.blue + '8003'.yellow);
-console.log('http server '.blue + 'started '.green.bold + 'on port '.blue + '9003 '.yellow);
+// target server
+createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' })
+  res.write(`request from ${req.socket.localAddress}, and headers are ${JSON.stringify(req.headers, null, 2)}`)
+  res.end()
+}).listen(8001)
