@@ -17,7 +17,7 @@ npm install an-node-proxy --save
 ### http proxy
 ```js
 import {createServer} from 'http'
-import {createProxyServer} from '../src'
+import {createProxyServer} from 'an-node=proxy'
 
 // proxy server
 createProxyServer({
@@ -36,7 +36,7 @@ so does https, `an-node-proxy` also support
 ```js
 import express from 'express'
 import {createServer} from 'http'
-import {createProxy} from '../src'
+import {createProxy} from 'an-node-proxy'
 
 const app = new express()
 const proxy = createProxy({
@@ -58,18 +58,22 @@ createServer((req, res) => {
 ```
 ### mock
 ```js
-import http from 'http'
-import {join as pathjoin} from 'path'
+import {createServer} from 'http'
+import {createProxyServer} from 'an-node-proxy'
 
-http.createServer(function (req, res) {
-  proxy.proxy(req, res, {
-    mock: {
-      base: pathJoin(__dirname, 'mock'),
-      rules: [{
-        from: '/test/',
-        to: './'
-      }]
-    }
-  });
-}).listen(8009);
+// mock server
+createProxyServer({
+  mock: {
+      rules: [
+          {
+              from: '/test',
+              to: './examples/mock'
+          },
+          {
+              from: '/test/a.js',
+              to: './examples/a.js'
+          }
+      ]
+  }
+}).listen(8005)
 ```
