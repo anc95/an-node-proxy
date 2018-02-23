@@ -2,7 +2,7 @@
   "name": "an-node-proxy",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "dev": "babel src --watch -d lib",
     "build": "babel src -d lib"
