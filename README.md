@@ -16,37 +16,45 @@ npm install an-node-proxy --save
 ## Ussage
 ### http proxy
 ```js
-import http from 'http'
-import {createProxyServer} from 'an-node-proxy'
+import {createServer} from 'http'
+import {createProxyServer} from '../src'
 
-const proxy = createProxyServer({
-  target:'http://localhost:8002'
-}).listen(8001);
+// proxy server
+createProxyServer({
+  target: 'http://localhost:8001'
+}).listen(8000)
 
-http.createServer(function (req, res) {
-  res.write('from 8002')
-  res.end();
-}).listen(8002);
+// target server
+createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' })
+  res.write(`request from ${req.socket.localAddress}, and headers are ${JSON.stringify(req.headers, null, 2)}`)
+  res.end()
+}).listen(8001)
 ```
 so does https, `an-node-proxy` also support
 ### middileware
 ```js
 import express from 'express'
-import {join as pathjoin} from 'path'
-import {createProxy} from 'an-node-proxy'
+import {createServer} from 'http'
+import {createProxy} from '../src'
 
 const app = new express()
-const proxy = createProxy()
-
-app.use((req, res, next) => {
-    proxy.proxy(req, res, {
-        target: 'http://www.baidu.com'
-    })
-
-    next()
+const proxy = createProxy({
+    target: 'http://localhost:8004'
 })
 
-app.listen(8000)
+app.use((req, res) => {
+    proxy.proxy(req, res)
+})
+
+app.listen(8003)
+
+// target server
+createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' })
+    res.write(`request from ${req.socket.localAddress}, and headers are ${JSON.stringify(req.headers, null, 2)}`)
+    res.end()
+}).listen(8004)
 ```
 ### mock
 ```js

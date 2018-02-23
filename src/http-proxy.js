@@ -6,22 +6,23 @@ import EventEmitter from 'events'
 export default class HttpProxy extends EventEmitter{
     constructor(option, server) {
         super()
-        this.option = this.adaptMock(option)
+        
+        if (!option || (!option.mock && !option.target)) {
+            return console.error('at least one of [target, mock] option should given')
+        }
+
+        this.option = this.adaptOption(option)
         if (server) {
             this.server = createServer((req, res) => {
                 this.req = req
                 this.res = res
 
-                this.proxy(req, res, option, this)
+                this.proxy(req, res)
             })
         }
     }
 
-    adaptoption(option) {
-        if (!option.target) {
-
-        }
-
+    adaptOption(option) {
         this.adaptMock(option)
         this.adaptTarget(option)
 
@@ -65,7 +66,7 @@ export default class HttpProxy extends EventEmitter{
 
         rules.sort((a, b) => a.from.split('/').length - b.from.split('/'))
 
-        option.rules = {base, rules}
+        option.mock = {base, rules}
     }
 
     ensureUrlPrefix(url) {
@@ -78,8 +79,14 @@ export default class HttpProxy extends EventEmitter{
     //供中间件使用的代理函数
     proxy(req, res, option) {
         if (option) {
-            this.adaptoption(option)
+            if (!option.mock && !option.target) {
+                return console.error('at least one of [target, mock] option should given')
+            }
+            
+            option = this.adaptOption(option)
         }
+
+        option = this.option
         handleInCommingMsg(req, res, option, this)
     }
 
